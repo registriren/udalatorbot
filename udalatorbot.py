@@ -9,7 +9,6 @@ config = 'config.json'
 with open(config, 'r', encoding='utf-8') as c:
     conf = json.load(c)
     token = conf['access_token']
-    admin = conf['admin_userid']
 
 bot = BotHandler(token)
 
@@ -19,7 +18,13 @@ def main():
         if last_update: #проверка на пустое событие, если пусто - возврат к началу цикла
             user_id = bot.get_user_id(last_update)
             mid = bot.get_message_id(last_update)
-            if user_id != admin:
+            admins = bot.get_chat_admins(bot.get_chat_id(last_update))
+            list_admin = []
+            if admins:
+                admins = admins['members']
+                for admin in admins:
+                    list_admin.append(admin['user_id'])
+            if user_id not in list_admin:
                 bot.delete_message(mid)
 
 if __name__ == '__main__':
